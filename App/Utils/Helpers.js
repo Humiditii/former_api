@@ -49,9 +49,16 @@ class Helpers {
     }
 
     static statuses(){
-        const _stat = {
+        return {
             ok : 200,
-            created: 201
+            created: 201,
+            no_content: 204,
+            bad_req: 400, // failed validation
+            forbidden: 403, // authenticated but not permitted to access
+            not_found: 404,
+            unauthorized: 401,
+            accepted: 202,
+            not_allowed_mthod: 405
         }
     }
 

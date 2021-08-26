@@ -35,6 +35,10 @@ const auth_model = new Schema({
             type: Boolean
         }
 
+    },
+
+    auth_count: {
+        
     }
 
 
