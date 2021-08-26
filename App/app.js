@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import authRoutes from './Routes/authRoutes';
 
 
 const app = express()
@@ -18,6 +19,8 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // app routes injection goes here --->>>>
+//Application routes
+app.use('/api/v1', authRoutes);
 
 //routes ends here
 app.use('/', (req, res)=> {

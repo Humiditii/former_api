@@ -1,4 +1,4 @@
-import app from './App/App';
+import app from './App/app';
 import dotenv from 'dotenv';
 import db_connection from './App/Utils/DbConnect';
 
