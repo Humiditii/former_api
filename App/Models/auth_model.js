@@ -39,7 +39,12 @@ const auth_model = new Schema({
 
     auth_count: {
         
-    }
+    },
+    // other profile details
+    user_dp : String,
+    address: String,
+    phone_no: Number
+
 
 
     

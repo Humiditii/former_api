@@ -1,5 +1,3 @@
-import Auth from '../Models/AuthModel';
-import Helper from '../Helpers/Helper';
 import jwt from 'jsonwebtoken';
 
 class Authwares {
@@ -27,7 +25,6 @@ class Authwares {
         }
     
         req.userId = decodedToken.userId;
-        req.role = decodedToken.role
 
         next();
     }

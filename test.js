@@ -64,13 +64,66 @@
     // storer.flush()
     // console.log(storer.state)
 
-    function status(){
-        return {
-            ok: 200,
-            created: 201
-        }
-    }
+    // function status(){
+    //     return {
+    //         ok: 200,
+    //         created: 201
+    //     }
+    // }
     
 
-    console.log(status().created)
+    // console.log(status().created)
+
+    let name_ = 'hameed'
+
+    function factorial(n) {
+        if (n === 0){
+            name_ = null
+            return 1
+        }
+        return  n*factorial(n-1)
+    }
+
+    // console.log(name_)
+    // console.log(factorial(4))
+    // console.log(name_)
     
+
+    // function reducer(n, s){
+    //     // n = date to clear s = date set
+    //     if( n === s ){
+    //         name_ = null
+    //         return 'cleared'
+    //     }
+    //     setTimeout( () => {
+    //         n-1000
+    //         console.log(n)
+    //     }, 1000)
+
+    //     return reducer(n-1)
+    // }
+
+    // console.log(name_)
+    // const n = Date.now() + (1000*120)
+    // const s = Date.now()
+    // console.log(reducer(n,s))
+    // console.log(name_)
+
+
+    
+
+    const brain = {
+        call_: (p) => {
+            if (p == 2){
+                return p
+            }
+            throw new Error('not defined')
+        }
+    }
+
+    try {
+        const b = brain.call_(22)
+        console.log(b)
+    } catch (err) {
+        console.log(err, 'from erh')
+    }
