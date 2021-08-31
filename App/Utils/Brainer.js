@@ -5,7 +5,7 @@ class Brainer {
         this.updater = {}
     }
 
-    cache(key, value, time, persist=false){
+    cache(key, value, time = 'not_set', persist=false){
 
         this.updater = {...this.brain}
 
@@ -13,11 +13,16 @@ class Brainer {
 
             this.updater[key] = {
                 data: value,
-                cached_at: Date.now(),
+                cached_at: Date.now(),      
                 hold_for: time
             }
 
             this.brain = this.updater
+
+            if( time !== 'not_set' ){
+                this.flush(this.updater[key].hold_for, key)
+            }
+
             this.updater = {}
 
             return 'cached'
@@ -31,11 +36,14 @@ class Brainer {
     recall(key){
 
         if(this.brain.hasOwnProperty(key)){
-            if( this.brain[key].cached_at * this.brain[key].hold_for <  Date.now() ){
 
-                this.brain[key] = null
-                delete this.brain[key]
-            }
+            // if( Date.now() > (this.brain[key].cached_at + this.brain[key].hold_for)){
+
+            //     this.brain[key] = null
+            //     delete this.brain[key]
+
+            //     return 'wipped'
+            // }
 
             return { 
 
@@ -45,6 +53,7 @@ class Brainer {
 
         }else{
             return {
+
                 msg: 'Key not found',
                 found: false
             }
@@ -65,6 +74,17 @@ class Brainer {
 
             throw new Error('Key not found')
         }
+    }
+
+    flush(time, key){
+
+        setTimeout( ()=>{
+
+            this.brain[key] = null
+            delete this.brain[key]
+
+        }, time*1000)
+
     }
 
 

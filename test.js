@@ -112,18 +112,51 @@
 
     
 
-    const brain = {
-        call_: (p) => {
-            if (p == 2){
-                return p
+    // const brain = {
+    //     call_: (p) => {
+    //         if (p == 2){
+    //             return p
+    //         }
+    //         throw new Error('not defined')
+    //     }
+    // }
+
+    // try {
+    //     const b = brain.call_(22)
+    //     console.log(b)
+    // } catch (err) {
+    //     console.log(err, 'from erh')
+    // }
+
+    const a = {
+        name: 'Hameed',
+        school: 'futa',
+        house: 'ota',
+        age: 22
+    }
+
+    const b = {
+        Hameed: 'yes',
+        futa: 'akure'
+    }
+
+
+    const ar = []
+
+    for( aa in a ){
+       // console.log(aa)
+
+        for (bb in b){
+
+            if([bb] == a[aa]){
+                console.log(bb, aa)
             }
-            throw new Error('not defined')
         }
     }
 
-    try {
-        const b = brain.call_(22)
-        console.log(b)
-    } catch (err) {
-        console.log(err, 'from erh')
-    }
+    // const bb = (age='not') => {
+    //     console.log(age)
+    // }
+
+    // bb(20)
+    // bb()

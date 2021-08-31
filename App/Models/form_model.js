@@ -35,7 +35,20 @@ const formSchema = new Schema({
             field_type: String, 
             required: Boolean
         }
-    ]
+    ],
+
+    // fillers 
+    // {
+    //     school: [],
+    //     level: []
+    // }
+    // [
+    //     {
+    //         school:"futa",
+    //         level: 300
+    //     }
+    // ]
+    fillers: []
 })
 
 export default model('form', formSchema)
