@@ -12,6 +12,8 @@ formRoute.get('/forms', AuthWare.checkAuthentication, FormController.get_all)
 
 formRoute.get('/configs/:form_id', AuthWare.checkAuthentication, FormController.load_form_configs)
 
+formRoute.put('/fill_form/:form_id', FormController.form_submit)
+
 
 
 baseRoute.use('/form', formRoute)

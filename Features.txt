@@ -1,0 +1,5 @@
+include payment option for forms that required paying certain amounts before registration
+
+email : sending certain dynamic responses to user mail
+
+notification on new form filled i.e the form administartor

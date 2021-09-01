@@ -193,7 +193,16 @@ class FormController {
 
     static async form_submit(req, res, next){
 
-        const {configs_} = FormBrain.recall('_form_config_').response.data;
+        const { configs_, expiry_time } = FormBrain.recall('_form_config_').response.data;
+
+        if( Date.now() > expiry_time ){
+            const err = {}
+
+            err.message = 'ops!!! Form expired, contact the administrator',
+            err.statusCode = 400
+
+            return Helpers.appError(err, next)
+        }
 
         const {form_id} = req.params;
 
@@ -213,6 +222,8 @@ class FormController {
         const {form_filled} = req.body
 
         const new_obj = {}
+
+        new_obj[filled_at] = Date.now()
 
         const err_obj = {}
 
@@ -272,7 +283,8 @@ class FormController {
             FormBrain.forget('_form_config_')
 
             return res.status(status.ok).json({
-                
+                statusCode: status.ok,
+                message: 'Form submitted successfully'
             })
             
         } catch (err) {
@@ -280,6 +292,25 @@ class FormController {
             return Helpers.appError(err, next)
         }
     }
+
+    static async get_form_file(req, res, next){
+
+        const {userId} = req
+
+        const {form_id} = req.params
+
+        try {
+
+            const the_form = await Form.findById(form_id)
+            
+        } catch (err) {
+
+            return Helpers.appError(err, next)  
+        }
+
+    }
+
+
 }
 
 export default FormController

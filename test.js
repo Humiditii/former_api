@@ -160,3 +160,15 @@
 
     // bb(20)
     // bb()
+
+    const people = {
+        hameed: {
+            school: 'futa',
+            house: 'ota',
+            level: 500
+        }
+    }
+
+    const { hameed:{ school } }  = people
+
+    console.log(school)
