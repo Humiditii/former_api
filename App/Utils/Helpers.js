@@ -29,7 +29,8 @@ class Helpers {
     static generateToken(user_token_data){
         return sign({
             email:user_token_data.email,
-            userId: user_token_data.id
+            userId: user_token_data.id,
+            access_type: user_token_data.access_type
         }, process.env.SECRET,  { expiresIn: '24h' })
     }
 

@@ -171,4 +171,20 @@
 
     const { hameed:{ school } }  = people
 
-    console.log(school)
+    // console.log(school)
+
+    const model = 'model/split.js'
+
+    let path_ 
+
+    for (const itr of model) {
+
+        if(itr === '/' ){
+
+            path_ = model.split('/')
+        }
+
+    
+    }
+
+    console.log(path_)

@@ -1,5 +1,39 @@
+...
 include payment option for forms that required paying certain amounts before registration
 
 email : sending certain dynamic responses to user mail
 
 notification on new form filled i.e the form administartor
+
+super admin i.e me to get info about all the application activities
+
+bulk sms sending
+
+fill muliple form as an administartor by uploading a structured tabular file/data 
+
+Authentication
+    signin
+        fingerprint -> done
+        password email -> done
+        ipaddress
+    signup -> done
+
+    forget password
+    change password
+    update profile
+    set fingerprint
+
+Caching -> done
+
+Form 
+    create form -> done
+    delete form -> done
+    get all forms created -> done
+    load form configurations-> done
+    submit form -> done
+    get a form details as csv or pdf file
+
+Analytics
+
+
+    

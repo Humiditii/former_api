@@ -17,12 +17,14 @@ class AuthController {
                 const new_user = await new Auth({...req.body}).save()
 
                 return res.status(status.created).json({
+
                     statusCode: status.created,
                     message: 'user created, proceed to login'
                 })   
             }
 
         } catch (error) {
+
             Helpers.appError(error, next)
         }
     }
@@ -44,18 +46,25 @@ class AuthController {
             if(finder.fingerprint.finger_id !== finger) return Helpers.appError({message:'fingerprint mismatch', statusCode:status.forbidden} ,next)
 
             const token = Helpers.generateToken({
+
                 email: finder.fingerprint.finger_id,
-                userId: fnder._id
+                userId: fnder._id,
+                access_type: finder.access_type
+
             }) 
 
             return res.status(status.ok).json({
+
                 message:'User authenticated',
                 statusCode: status.ok,
                 data:{
+
                     token: token
                 }
+
             })
         }
+
         if(auth_type === 'ip'){
             
         }
@@ -67,33 +76,41 @@ class AuthController {
             const finder = await Auth.findOne({email: email})
 
             if(!finder) return Helpers.appError(
+                
                 {
                     message: ` User ${email} not found`,
                     statusCode: 404
                 }
+
             , next)
 
             if(Helpers.decodePwd(password,finder.password)){
 
                 const token_payload = {
-                    email: finder.mail,
-                    userId: finder._id
+
+                    email: finder.email,
+                    userId: finder._id,
+                    access_type: finder.access_type
                 }
 
                 const token = Helpers.generateToken(token_payload)
 
                 return res.status(200).json({
+
                     message: `${finder.email} authenticated`,
                     statusCode: status.ok,
                     data: {
                         token: token
                     }
                 })
+
             }else{
 
                 return res.status(400).json({
+
                     message:'invalid password',
-                    statusCode: status.bad_req
+                    statusCode: status.bad_req,
+
                 })
             }
 
@@ -101,6 +118,11 @@ class AuthController {
 
             return Helpers.appError(error, next)
         }
+    }
+
+    static async set_finger(req, res, next){
+        
+        const userId = {req}
     }
 }
 

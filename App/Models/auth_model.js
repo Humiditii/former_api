@@ -43,7 +43,11 @@ const auth_model = new Schema({
     // other profile details
     user_dp : String,
     address: String,
-    phone_no: Number
+    phone_no: Number,
+    access_type: {
+        type: String,
+        default: 'sudo_0'
+    }
 
 
 

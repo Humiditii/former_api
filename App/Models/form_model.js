@@ -37,6 +37,14 @@ const formSchema = new Schema({
         }
     ],
 
+    payment: {
+        subscribed: false,
+        amount: 0,
+        account_number: Number,
+        bank_name: String
+
+    },
+
     // fillers 
     // {
     //     school: [],

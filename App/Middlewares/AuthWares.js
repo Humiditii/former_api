@@ -5,6 +5,7 @@ class Authwares {
         const authHeader = req.get('Authorization') || req.headers['x-access-token'] || req.headers['Authorization'];
 
         if (!authHeader) {
+            
             const error = new Error('Not Authorized');
             error.statusCode = 401;
             throw error;
@@ -19,12 +20,14 @@ class Authwares {
             return next (err);
         }
         if (!decodedToken) {
+
             const error = new Error('Not Authenticated');
             error.statusCode = 401;
             throw error;
         }
     
         req.userId = decodedToken.userId;
+        req.role = decodedToken.access_type
 
         next();
     }
@@ -41,7 +44,7 @@ class Authwares {
     }
 
     static userAccess(req, res, next){
-        if(req.role !== 'User'){
+        if(req.role !== 'sudo_0'){
             const error = new Error('Permission denied');
             error.statusCode = 401 
             throw error
