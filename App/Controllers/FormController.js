@@ -1,6 +1,8 @@
 import Form from '../Models/form_model';
 import Helpers from '../Utils/Helpers';
 import Brainer from '../Utils/Brainer'
+import Email from '../Utils/Email';
+import Auth from '../Models/auth_model';
 
 const status = Helpers.statuses();
 
@@ -158,7 +160,7 @@ class FormController {
             //             "required": true
             //         }
 
-            const  {expiry_time, _id, formname, fields} = form
+            const  { expiry_time, _id, formname, fields, payment,send_mail } = form
 
             const configs_ = new Array()
 
@@ -179,11 +181,16 @@ class FormController {
                 message: 'Fetched',
                 statusCode: status.ok,
                 data: {formname, _id, expiry_time, configs_}
+
             }
 
             FormBrain.cache('form_config',response, 3*60)
 
             FormBrain.cache('_form_config_',response)
+
+            FormBrain.cache('_send_mail_', send_mail)
+
+            FormBrain.cache('_payment_',payment)
 
             return res.status(status.ok).json({ response })
 
@@ -193,9 +200,14 @@ class FormController {
 
     static async form_submit(req, res, next){
 
-        const { configs_, expiry_time } = FormBrain.recall('_form_config_').response.data;
+        const { configs_, expiry_time } = FormBrain.recall('_form_config_').neuron.response.data;
+
+        const _payment_ = FormBrain.recall('_payment_').neuron
+
+        const _send_mail_ = FormBrain.recall('_send_mail_').neuron
 
         if( Date.now() > expiry_time ){
+
             const err = {}
 
             err.message = 'ops!!! Form expired, contact the administrator',
@@ -231,7 +243,14 @@ class FormController {
 
         err_obj.message = 'Validation error'
 
+        const mail_obj = {}
+
         for (const key_o in form_filled) {
+
+            if( !mail_obj.hasOwnProperty('mail') && RegExp('mail|email', 'i').test(key_o)){
+
+                mail_obj[mail] = form_filled[key_o] 
+            }
 
             for (const key_1 in configs_) {
                 
@@ -257,8 +276,7 @@ class FormController {
         }
 
         if( err_obj.length > 0 ) return Helpers.appError(err_obj, next)
-
-        
+                
         // "configs_": [
         //     {
         //         "name": "school",
@@ -276,21 +294,60 @@ class FormController {
             
             const get_form = await Form.findById(form_id)
 
-            const {fillers} = get_form
+            const {fillers, creator, formname} = get_form
+
+            const {fullname} = await Auth.findById(creator)
 
             fillers.push(new_obj)
 
+            get_form.save()
+
+            if(mail_obj[mail]){
+                // send mail function here
+                if(_send_mail_){
+
+                    Email.formSubmitResponseTemplate({
+
+                        to: mail_obj[mail],
+                        from: `${fullname}forms.com`,
+                        subject: `Your response to ${formname} has been saved`
+
+                    })
+
+                }
+
+            }
+
             FormBrain.forget('_form_config_')
 
-            return res.status(status.ok).json({
+            FormBrain.forget('_send_mail_')
+
+            FormBrain.forget('_payment_')
+
+            const resp = {
                 statusCode: status.ok,
-                message: 'Form submitted successfully'
-            })
+                message: null
+            }
+
+            resp.message = _payment_.subscribed ? 'Proceed to payment page' : 'Form submitted successfully'
+
+            
+            return res.status(status.ok).json(resp)
             
         } catch (err) {
             
             return Helpers.appError(err, next)
+
         }
+    }
+
+
+    static async payer(req, res, next){
+
+        const {form_id} = req.params
+
+        const {cvv, pin, bank} = req.body
+
     }
 
     static async get_form_file(req, res, next){
@@ -309,7 +366,6 @@ class FormController {
         }
 
     }
-
 
 }
 

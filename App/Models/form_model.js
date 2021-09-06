@@ -44,7 +44,7 @@ const formSchema = new Schema({
         bank_name: String
 
     },
-
+    send_mail: false,
     // fillers 
     // {
     //     school: [],

@@ -2,6 +2,9 @@
 import Admin from '../Models/admin_model';
 import Form from '../Models/form_model';
 import Helpers from '../Utils/Helpers';
+import Brainer from '../Utils/Brainer';
+
+const AdminBrain = new Brainer()
 
 const {appError, hashPassword, statuses} = Helpers
 
@@ -59,6 +62,7 @@ class AdminController {
     static admin_dashboard(){
 
         const resp = {
+
             length_of_itms: null,
             creators:[],
             unique_count: [
@@ -91,7 +95,9 @@ class AdminController {
 
         try {
             
-            const forms = await Form.find()
+            const form_length = await Form.count()
+
+            this.admin_dashboard().length_of_itms = form_length
 
         } catch (error) {
 

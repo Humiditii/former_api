@@ -42,6 +42,7 @@ const auth_model = new Schema({
     },
     // other profile details
     user_dp : String,
+    fullname: String,
     address: String,
     phone_no: Number,
     access_type: {
