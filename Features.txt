@@ -19,9 +19,9 @@ Authentication
     signup -> done
 
     forget password
-    change password
+    change password -> done
     update profile
-    set fingerprint
+    set fingerprint -> done
 
 Caching -> done
 
@@ -34,6 +34,8 @@ Form
     get a form details as csv or pdf file
 
 Analytics
+
+payment ledger
 
 
     

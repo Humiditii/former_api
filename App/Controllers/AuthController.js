@@ -101,7 +101,7 @@ class AuthController {
                     statusCode: status.ok,
                     data: {
                         token: token
-                    }
+                    }               
                 })
 
             }else{
@@ -123,6 +123,63 @@ class AuthController {
     static async set_finger(req, res, next){
         
         const userId = {req}
+
+        const {fingerprint} = req.body
+
+        const find_user = await Auth.findByIdAndUpdate(userId, { 
+
+            fingerprint: {
+                active: true,
+                finger_id:fingerprint
+            }
+
+         } )
+
+    }
+
+    static async changePassword(req, res, next){
+
+        const {userId} = req
+
+        const {old_password, new_password} = req.body
+
+        const user = await Auth.findById(userId)
+
+        if( Helpers.decodePwd(old_password, user.password) ){
+
+            user.password = Helpers.hashPassword(new_password)
+
+            await user.save()
+
+            return res.status(status.ok).json({
+
+                statusCode: status.ok,
+                message: 'password updated'
+
+            })
+
+        }
+
+        const err = {}
+
+        err.message = 'incorrect password'
+        err.statusCode = status.forbidden
+
+        return Helpers.appError(err)
+    }
+
+    static async updateProfile(req, res, next){
+
+        
+
+    }
+
+    static async upload_profile(req, res, next){
+
+    }
+
+    static async forgetPassword(req, res, next){
+
     }
 }
 

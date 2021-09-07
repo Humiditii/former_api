@@ -3,6 +3,7 @@ import Helpers from '../Utils/Helpers';
 import Brainer from '../Utils/Brainer'
 import Email from '../Utils/Email';
 import Auth from '../Models/auth_model';
+import Payer from '../Models/payer_model';
 
 const status = Helpers.statuses();
 
@@ -300,9 +301,9 @@ class FormController {
 
             fillers.push(new_obj)
 
-            get_form.save()
+            !_payment_.subscribed ? get_form.save() : FormBrain.cache('_hold_fillers_', fillers ) 
 
-            if(mail_obj[mail]){
+            if( mail_obj[mail] && _payment_.subscribed ){
                 // send mail function here
                 if(_send_mail_){
 
@@ -322,8 +323,6 @@ class FormController {
 
             FormBrain.forget('_send_mail_')
 
-            FormBrain.forget('_payment_')
-
             const resp = {
                 statusCode: status.ok,
                 message: null
@@ -341,13 +340,58 @@ class FormController {
         }
     }
 
+    static async get_payer(req, res, next){
+
+        const { _id } = new Payer({...req.body}).save()
+
+        return res.status(201).json({
+            message: 'payer created',
+            statusCode: status.created,
+            data: { payer_id : _id }
+        })
+    }
+
 
     static async payer(req, res, next){
 
-        const {form_id} = req.params
+        const _hold_fillers_ = FormBrain.recall('_hold_fillers_').neuron
 
-        const {cvv, pin, bank} = req.body
+        const _payment_ = FormBrain.recall('_payment_').neuron
 
+        const { form_id, payer_id } = req.params
+
+        const {email, phonenumber, name} = await Payer.findById(payer_id)
+
+        const payment_configs = {
+
+            endpoint: 'https://api.flutterwave.com/v3/payments',
+            header: `Authorization: Bearer ${process.env.FLUTTERWAVE_API_SEC_KEY}`,
+            requests:  {
+
+                "tx_ref":"hooli-tx-1920bbtytty",
+                "amount":_payment_.amount,
+                "currency":"NGN",
+                "redirect_url":"https://webhook.site/9d0b00ba-9a69-44fa-a43d-a82c33c36fdc",
+                "payment_options":"card",
+                // "meta":{
+                //    "consumer_id":23,
+                //    "consumer_mac":"92a3-912ba-1192a"
+                // },
+                "customer":{
+                   "email":email,
+                   "phonenumber":phonenumber,
+                   "name":name
+                },
+                "customizations":{
+                   "title":"Pied Piper Payments",
+                   "description":"Middleout isn't free. Pay the price",
+                   "logo":"https://assets.piedpiper.com/logo.png"
+                }
+    
+            }
+
+        }
+        
     }
 
     static async get_form_file(req, res, next){
