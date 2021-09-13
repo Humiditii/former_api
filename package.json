@@ -8,11 +8,12 @@
     "dev": "nodemon --exec babel-node index.js",
     "start": "babel-node index.js",
     "kill": "killall -9 node",
-    "born" : "node App/FileCreator.js" 
+    "born": "node App/FileCreator.js"
   },
   "author": "Sebago",
   "license": "MIT",
   "dependencies": {
+    "axios": "^0.21.4",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-install": "^2.1.0",
@@ -28,7 +29,8 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.20",
     "nodemailer": "^6.4.10",
-    "nodemailer-sendgrid-transport": "^0.2.0"
+    "nodemailer-sendgrid-transport": "^0.2.0",
+    "uuid": "^3.4.0"
   },
   "devDependencies": {
     "babel-polyfill": "^6.26.0",

@@ -168,7 +168,7 @@
 //             level: 500
 //         }
 //     }
-
+EE
 //     const { hameed:{ school } }  = people
 
 //     // console.log(school)

@@ -126,14 +126,28 @@ class AuthController {
 
         const {fingerprint} = req.body
 
-        const find_user = await Auth.findByIdAndUpdate(userId, { 
+        try {
+            
+            const find_user = await Auth.findByIdAndUpdate(userId, { 
 
-            fingerprint: {
-                active: true,
-                finger_id:fingerprint
-            }
+                fingerprint: {
+                    active: true,
+                    finger_id:fingerprint
+                }
+    
+             } )
 
-         } )
+            return res.status(status.ok).json({
+
+                message: 'Fingerprint set',
+                statusCode: status.ok
+                
+            })
+
+        } catch (error) {
+
+            return Helpers.appError(error, next)
+        }
 
     }
 

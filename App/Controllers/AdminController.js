@@ -99,6 +99,8 @@ class AdminController {
 
             this.admin_dashboard().length_of_itms = form_length
 
+            next()
+
         } catch (error) {
 
             return appError(error, next)
@@ -106,6 +108,15 @@ class AdminController {
 
     }
 
+    static async get_creators(req, res, next){
+ 
+
+    }
+
+    static async creators_using_payment(req, res, next){
+
+
+    }
 
     
 }
