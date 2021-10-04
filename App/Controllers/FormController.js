@@ -123,7 +123,7 @@ class FormController {
 
         const {form_id} = req.params
 
-        const get_cfg_frm_brain = FormBrain.recall('form_config')
+        const get_cfg_frm_brain = FormBrain.recall('_form_config_')
 
         if(get_cfg_frm_brain.found){
             // return cache
@@ -185,7 +185,7 @@ class FormController {
 
             }
 
-            FormBrain.cache('form_config',response, 3*60)
+            // FormBrain.cache('form_config',response, 3*60)
 
             FormBrain.cache('_form_config_',response)
 
@@ -201,7 +201,9 @@ class FormController {
 
     static async form_submit(req, res, next){
 
-        const { configs_, expiry_time } = FormBrain.recall('_form_config_').neuron.response.data;
+        // console.log(FormBrain.recall('_form_config_'))
+
+        const { configs_, expiry_time } = FormBrain.recall('_form_config_').neuron.data.data;
 
         const _payment_ = FormBrain.recall('_payment_').neuron
 
@@ -231,12 +233,35 @@ class FormController {
         //     level: 200 // check type and if present
             
         // }
+
+        // "configs_": [
+        //     {
+        //         "name": "school",
+        //         "field_type": "String",
+        //         "required": true
+        //     },
+        //     {
+        //         "name": "level",
+        //         "field_type": "number",
+        //         "required": true
+        //     }
+        // ]
+
+        // {
+        //     config_.name_value: fromClient_key
+        // }
+        // process of filling the form:
+        // loop through the client request body and the config object
+        // check the key from the client request body in the loope dconfig object property
+        // check for errors_send_mail_
+        //create an object property with the client property
+        // 
         
         const {form_filled} = req.body
 
         const new_obj = {}
 
-        new_obj[filled_at] = Date.now()
+        new_obj['filled_at'] = Date.now()
 
         const err_obj = {}
 
@@ -248,35 +273,47 @@ class FormController {
 
         for (const key_o in form_filled) {
 
+            //console.log(key_o)
+
             if( !mail_obj.hasOwnProperty('mail') && RegExp('mail|email', 'i').test(key_o)){
 
-                mail_obj[mail] = form_filled[key_o] 
+                mail_obj['mail'] = form_filled[key_o] 
             }
 
             for (const key_1 in configs_) {
+
+                //console.log(key_1, configs_)
                 
-                if( key_o === configs_[key_1]){
+                if( key_o === configs_[key_1].name ){
 
-                    if( configs_.required ){
+                    if( configs_[key_1].required ){
 
-                        if( configs_.field_type.toLowerCase() == typeof form_filled[key_o] ){
+                        if( configs_[key_1].field_type.toLowerCase() === typeof form_filled[key_o] ){
 
                             new_obj[key_o] = form_filled[key_o]
 
+                        }else{
+                            
+                            err_obj[key_o] = { type_err: `${key_o} typeError, must be ${configs_[key_1].field_type} ` }
                         }
 
-                        err_obj[key_o] = { type_err: `${key_o} typeError, must be ${configs_.field_type} ` }
+                    }else{
+
+                        err_obj[key_o] = { empty_err: `${key_o} can\'t be empty ` }
 
                     }
 
-                    err_obj[key_o] = { empty_err: `${key_o} can\'t be empty ` }
-
-                    if( err_obj.hasOwnProperty(key_0) ) err_obj.length += 1
+                    if( err_obj.hasOwnProperty(key_o) ) err_obj.length += 1
                 }
             }
         }
 
-        if( err_obj.length > 0 ) return Helpers.appError(err_obj, next)
+        //console.log(err_obj)
+
+        const err = {}
+        err.message = err_obj
+
+        if( err_obj.length > 0 ) return Helpers.appError(err, next)
                 
         // "configs_": [
         //     {
@@ -299,17 +336,17 @@ class FormController {
 
             const {fullname} = await Auth.findById(creator)
 
-            fillers.push(new_obj)
+            // console.log(new_obj)
 
-            !_payment_.subscribed ? get_form.save() : FormBrain.cache('_hold_fillers_', fillers ) 
+            !_payment_.subscribed ?( fillers.push(new_obj), get_form.save() ) : FormBrain.cache('_hold_this_person_', new_obj ) 
 
-            if( mail_obj[mail] && _payment_.subscribed ){
+            if( mail_obj['mail'] && _payment_.subscribed ){
                 // send mail function here
                 if(_send_mail_){
 
                     Email.formSubmitResponseTemplate({
 
-                        to: mail_obj[mail],
+                        to: mail_obj['mail'],
                         from: `${fullname}forms.com`,
                         subject: `Your response to ${formname} has been saved`
 
@@ -334,10 +371,201 @@ class FormController {
             return res.status(status.ok).json(resp)
             
         } catch (err) {
+
+            // console.log(err)
             
             return Helpers.appError(err, next)
 
         }
+    }
+
+    static async fill_multiple(req, res, next){
+
+        const {userId} = req
+
+        const {form_id} = req.params;
+
+        const [ _payment_, _send_mail_ ] = [ FormBrain.recall('_payment_').neuron, FormBrain.recall('_send_mail_').neuron ]
+
+        // filler_object must be an array, and overide_expiry must be a boolean and must hold a value
+        const {filler_object, overide_expiry} = req.body
+
+        const req_body_err = {}
+
+        req_body_err.messsage = {}
+
+        req_body_err.error = false
+
+        if( typeof filler_object !== 'object' && 
+        !filler_object.hasOwnProperty('length') ){
+
+            req_body_err.error = true
+
+            req_body_err.messsage['filler_object'] = 'filler_object must be an array'
+
+        }
+
+        if(overide_expiry == null){
+
+            req_body_err.error = req_body_err.error ? req_body_err.error : true
+
+            req_body_err.messsage['overide_expiry'] = 'overide_expiry must be a boolean and can\'t be empty'
+
+        }
+
+        if( req_body_err.error )return Helpers.appError(req_body_err, next)
+
+        const { configs_, expiry_time } = FormBrain.recall('_form_config_').neuron.data.data;
+
+        if( Date.now() > expiry_time && overide_expiry ){
+
+            const err = {}
+
+            err.message = 'ops!!! Form expired, contact the administrator',
+            err.statusCode = 400
+
+            return Helpers.appError(err, next)
+        }
+
+        var [ new_obj, new_obj_array ] = [ {}, [] ]
+
+        var [err_obj, error_arr ] = [ {}, [] ]
+
+        var [ mail_obj, mail_obj_arr ] = [ {}, [] ]
+
+        // [
+        //     {  },
+        //     {  },
+        //     {  }
+        // ]
+
+        for (const filler_x of filler_object ) {
+            
+            for (const key_0 in filler_x) {
+
+                if( !mail_obj.hasOwnProperty('email') && RegExp('mail|email', 'i').test(key_0)){
+
+                    mail_obj['mail'] = form_filled[key_0] 
+
+                    mail_obj_arr.push(mail_obj)
+
+                    mail_obj = {}
+                }
+
+                for (const key_1 in configs_) {
+                   
+                    if( key_0 === configs_[key_1].name ){
+
+                        if( configs_[key_1].required ){
+
+                            if( configs_[key_1].field_type.toLowerCase() === typeof filler_x[key_0]  ){
+                            
+                                new_obj[key_0] = filler_x[key_0]
+
+                            }else{
+
+                                err_obj[key_0] = {
+
+                                    type_err: `${key_0} for index ${filler_object.indexOf(filler_x) + 1 } typeError, must be ${configs_[key_1].field_type} ` 
+                                }
+
+                                error_arr.push(err_obj)
+
+                                err_obj = {}
+
+                            }
+
+                        }else{
+
+                            err_obj[key_0] = { empty_err: `${key_0} can\'t be empty , for index ${filler_object.indexOf(filler_x) + 1 } ` }
+
+                            error_arr.push(err_obj)
+
+                            err_obj = {}
+
+                        }
+
+                    }
+
+                }
+            }
+
+            new_obj_array.push(new_obj)
+
+            new_obj = {}
+
+        }
+
+        const err = {}
+
+        err.message = error_arr
+
+        if( error_arr.length > 0 ) return Helpers.appError(err, next)
+
+        try {
+            
+            const get_form = await Form.findById(form_id)
+
+            const {fillers, formname} = get_form
+
+            const {fullname} = await Auth.findById(userId)
+
+            !_payment_.subscribed ?( fillers.push(...new_obj_array) , get_form.save() ) : FormBrain.cache('_hold_this_people_', new_obj ) 
+
+            if( mail_obj_arr.length > 0 && _payment_.subscribed && _send_mail_ ){
+                // send mail function here
+                
+                    for (const person_x of mail_obj_arr) {
+                        
+                        Email.formSubmitResponseTemplate({
+
+                            to: person_x['mail'],
+                            from: `${fullname}forms.com`,
+                            subject: `Your response to ${formname} has been saved, filled by admin`
+    
+                        })
+
+                    }
+
+            }
+
+
+        } catch (error) {
+            
+            return Helpers.appError(error, next)
+
+        }
+
+    }
+
+    static async get_fillers (req, res, next){
+
+        const _get_fillers_ = FormBrain.recall('_fillers_')
+
+        if(_get_fillers_.found){
+            // return cache
+            const cache_res = _get_fillers_.neuron
+
+            cache_res.message = 'fetched from cache'
+
+            return res.status(status.ok).json(cache_res.data)
+
+        }
+
+        const {form_id} = req.params
+
+        const get_form_fillers = await Form.findById(form_id).select('fillers')
+
+        const resp = {
+            statusCode: status.ok,
+            message: 'Fillers fetched from Db',
+            data: get_form_fillers
+        }
+
+        FormBrain.cache('_fillers_',resp, 3*60)
+
+        return res.status(status.ok).json(resp)
+
     }
 
     static async get_payer(req, res, next){
@@ -354,7 +582,7 @@ class FormController {
 
     static async payer(req, res, next){
 
-        const _hold_fillers_ = FormBrain.recall('_hold_fillers_').neuron
+        const _hold_this_person_ = FormBrain.recall('_hold_this_person_').neuron
 
         const _payment_ = FormBrain.recall('_payment_').neuron
 
@@ -393,6 +621,7 @@ class FormController {
         }
         
     }
+
 
     static async get_form_file(req, res, next){
 

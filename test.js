@@ -168,7 +168,7 @@
 //             level: 500
 //         }
 //     }
-EE
+
 //     const { hameed:{ school } }  = people
 
 //     // console.log(school)
@@ -192,10 +192,20 @@ EE
 //     console.log(RegExp('mail|email', 'i').test('e-mail'))
 
 
-try {
-    const m = 1
-    const n = m+ z
-    console.log(n)
-} catch (error) {
-    console.log(error.name)
+// try {
+//     const m = 1
+//     const n = m+ z
+//     console.log(n)
+// } catch (error) {
+//     console.log(error.name)
+// }
+
+
+
+const a = ['bot', 'cat', 'dog']
+
+for (const iterator of a) {
+    
+    console.log( a.indexOf(iterator) , iterator)
+
 }

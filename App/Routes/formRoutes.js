@@ -14,8 +14,12 @@ formRoute.get('/configs/:form_id', AuthWare.checkAuthentication, FormController.
 
 formRoute.put('/fill_form/:form_id', FormController.form_submit)
 
+formRoute.delete('/delete/:form_id', AuthWare.checkAuthentication, FormController.delete)
+
+formRoute.get('/fillers/:form_id', AuthWare.checkAuthentication, FormController.get_fillers)
 
 
 baseRoute.use('/form', formRoute)
 
 export default baseRoute
+  

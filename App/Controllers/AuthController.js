@@ -105,7 +105,6 @@ class AuthController {
                 })
 
             }else{
-
                 return res.status(400).json({
 
                     message:'invalid password',
@@ -121,14 +120,14 @@ class AuthController {
     }
 
     static async set_finger(req, res, next){
-        
-        const userId = {req}
+      
 
         const {fingerprint} = req.body
 
         try {
+
             
-            const find_user = await Auth.findByIdAndUpdate(userId, { 
+            const find_user = await Auth.findByIdAndUpdate(req.userId, { 
 
                 fingerprint: {
                     active: true,
@@ -179,7 +178,7 @@ class AuthController {
         err.message = 'incorrect password'
         err.statusCode = status.forbidden
 
-        return Helpers.appError(err)
+        return Helpers.appError(err, next)
     }
 
     static async updateProfile(req, res, next){

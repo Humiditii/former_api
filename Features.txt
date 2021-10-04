@@ -1,5 +1,5 @@
 ...
-include payment option for forms that required paying certain amounts before registration
+include payment option for forms that required paying certain amounts before registration -> ongoing
 
 email : sending certain dynamic responses to user mail: -> done
 
@@ -31,6 +31,7 @@ Form
     get all forms created -> done
     load form configurations-> done
     submit form -> done
+    get list of fillers -> Done
     get a form details as csv or pdf file
 
 Analytics
